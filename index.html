@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peneira de Eratóstenes</title>
+    <style>
+        /* Estilos CSS para a aparência da página */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('imagens/fundo-madeira.jpg');
+        }
+        #container {
+            text-align: center;
+            background-color: burlywood;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            margin: 50px auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        input[type="number"] {
+            padding: 8px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        input[type="number"]::placeholder {
+            color: #999;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultado-iframe {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .explicacao {
+            display: none;
+            text-align: left;
+        }
+        .btn-explicacao {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: block;
+            margin: 0 auto;
+        }
+        .btn-explicacao:hover {
+            background-color: #218838;
+        }
+        footer{
+            border-top: 1px solid #333;
+            background-color: burlywood;
+            color: white;
+            bottom: 0;
+            left: 0;
+            height: 40px;
+            position: fixed;
+            width: 100%;
+            text-align: center;
+        }
+        footer > a{
+            font-style: oblique
+            color: #28a745 ;
+        }
+        footer >a:hover{
+            background-color: #000000; 
+
+            transition: 0.5s;
+
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Peneira de Eratóstenes</h1>
+        <button class="btn-explicacao" onclick="toggleExplicacao('teorica')">Como funciona?</button>
+        <div id="explicacao-teorica" class="explicacao">
+            <p>A peneira de Eratóstenes é um algoritmo utilizado para encontrar todos os números primos até um determinado limite.</p>
+            <p>O algoritmo funciona marcando os múltiplos de cada número primo encontrado. Ao final do processo, os números não marcados são os números primos desejados.</p>
+            <button class="btn-explicacao" onclick="toggleExplicacao('pratica')">Explicação na prática</button>
+        </div>
+        <div id="explicacao-pratica" class="explicacao">
+            <ol>
+                <h3 style="text-align: center;">Vamos exemplificar o algoritmo com o número 20:</h3>
+                <li>
+                    <p> Começamos com a lista: 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20.</p>
+                </li>
+                <li>
+                    <p> O primeiro número é 2, marcamos como primo e eliminamos todos os seus múltiplos, sobrando: 2, 3, 5, 7, 9, 11, 13, 15, 17, 19.</p>
+                </li>
+                
+                <li>
+                    <p>O próximo número não marcado é 3, marcamos como primo e eliminamos todos os seus múltiplos: 3, 5, 7, 11, 13, 17, 19. para todos os números restantes até chegar a 37.</p>
+                </li>
+                <li>
+                    <p>O próximo número não marcado é 5, marcamos como primo e eliminamos todos os seus múltiplos: 5, 7, 11, 13, 17, 19.</p>
+                </li>
+                <li>
+                    <p>Não há mais números não marcados na lista. Os números primos são: 2, 3, 5, 7, 11, 13, 17, 19.</p>
+                </li>
+            </ol>
+        </div>
+        
+        <input type="number" id="limite" placeholder="Digite o número primo aqui">
+        <button onclick="encontrarPrimos()">Encontrar Números Primos</button>
+        <label for="gerarDocumento">
+            <input type="checkbox" id="gerarDocumento" title="Marque essa opção para gerar um arquivo txt com todos os números primos">
+            Gerar arquivo TXT
+        </label>
+        <iframe id="resultado-iframe"></iframe>
+    </div>
+
+    <script>
+        // Função para encontrar números primos usando a peneira de Eratóstenes
+        function encontrarPrimos() {
+            var limite = parseInt(document.getElementById('limite').value);
+            var numerosPrimos = new Array(limite+1).fill(true);
+            
+            for (var i = 2; i * i <= limite; i++) {
+                if (numerosPrimos[i]) {
+                    for (var j = i * i; j <= limite; j += i) {
+                        numerosPrimos[j] = false;
+                    }
+                }
+            }
+            
+            var primosEncontrados = [];
+            for (var i = 2; i <= limite; i++) {
+                if (numerosPrimos[i]) {
+                    primosEncontrados.push(i);
+                }
+            }
+            
+            // Exibir o resultado na página dentro do iframe
+            var resultadoIframe = document.getElementById('resultado-iframe');
+            resultadoIframe.contentDocument.body.innerHTML = "<p>Números primos até " + limite + ": " + primosEncontrados.join(', ') + "</p>";
+            
+            // Verificar se a caixa de marcação para gerar arquivo TXT está marcada
+            var gerarDocumento = document.getElementById('gerarDocumento').checked;
+            if (gerarDocumento) {
+                // Se marcada, verificar o tamanho do arquivo
+                var tamanhoArquivo = new Blob([primosEncontrados.join(', ')], { type: 'text/plain' }).size;
+                var tamanhoMB = tamanhoArquivo / (1024 * 1024); // Convertendo para megabytes
+                var confirmacao = confirm("O arquivo que você vai baixar com os números primos terá aproximadamente " + tamanhoMB.toFixed(2) + " MB. Deseja baixar mesmo assim?");
+                if (!confirmacao) {
+                    // Se o usuário cancelar, desmarcar a caixa de marcação e exibir o resultado no iframe como antes
+                    document.getElementById('gerarDocumento').checked = false;
+                    resultadoIframe.contentDocument.body.innerHTML = "<p>Números primos até " + limite + ": " + primosEncontrados.join(', ') + "</p>";
+                    return;
+                }
+                // Se confirmado, fazer o download do arquivo
+                var blob = new Blob([primosEncontrados.join(', ')], { type: 'text/plain' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'numeros_primos.txt';
+                link.click();
+            }
+        }
+
+        // Função para mostrar ou ocultar a explicação do funcionamento da peneira de Eratóstenes
+        function toggleExplicacao(tipo) {
+            var btnExplicacao = document.querySelector('.btn-explicacao');
+            var explicacaoTeorica = document.getElementById('explicacao-teorica');
+            var explicacaoPratica = document.getElementById('explicacao-pratica');
+            if (tipo === 'teorica') {
+                if (explicacaoTeorica.style.display === 'none') {
+                    explicacaoTeorica.style.display = 'block';
+                    explicacaoPratica.style.display = 'none';
+                    btnExplicacao.textContent = 'Fechar explicação';
+                } else {
+                    explicacaoTeorica.style.display = 'none';
+                    btnExplicacao.textContent = 'Como funciona?';
+                }
+            } else if (tipo === 'pratica') {
+                if (explicacaoPratica.style.display === 'none') {
+                    explicacaoPratica.style.display = 'block';
+                    explicacaoTeorica.style.display = 'none';
+                    btnExplicacao.textContent = 'Fechar explicação';
+                } else {
+                    explicacaoPratica.style.display = 'none';
+                    btnExplicacao.textContent = 'Explicação na prática';
+                }
+            }
+        }
+    </script>
+    <footer><label for="limite" style="width: auto;">Desenvolvido por Thiago Bessa <a href="https://thiagorbessa.github.io/Minhas-redes/">Contato</a></label></footer>
+</body>
+</html>
